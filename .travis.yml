@@ -1,0 +1,11 @@
+language: cpp
+dist: trusty
+sudo: false
+
+env:
+  matrix:
+    - argument1=0, argument2=0
+    - argument1=1, argument2=1
+
+script:
+    - _test/smoke.sh
