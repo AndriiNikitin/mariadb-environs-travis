@@ -1,22 +1,10 @@
-travis_script=${travis_script-'test/smoke.sh'}
-travis_env_global=${travis_env_global-'BRANCH=10.1'}
+travis_command=${travis_command-'_test/smoke.sh a1 a2'}
 travis_env_matrix=${travis_env_matrix-''}
 travis_repo=${travis_repo-13966407}
 
 set -e
 
 header=' -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3"'
-
-body='{
- "request": {
- "message": "Trigger '$travis_script' with '${travis_env_global}'",
- "branch":"master",
- "config": {
-   "env": {"global": ["'${travis_env_global}'"],
-           "matrix": ["'${travis_env_matrix}'"]}
-  }
-  "script":"'${travis_script}'"
-}}'
 
 tracing_was_set=0
 if [[ $(shopt -o xtrace) =~ on ]]  ; then
@@ -27,10 +15,20 @@ fi
 
 function post_job {
 
+body='{
+ "request": {
+ "message": "Trigger '$travis_command'",
+ "branch":"master",
+ "config": {
+   "env": {"global": ["travis_command='"'"${travis_command}"'"'"],
+           "matrix": ['${travis_env_matrix}']}
+  }
+}}'
+
 [ -f .travis.token ] && travis_token=$(cat .travis.token)
 [ -f .${travis_repo}.token ] && travis_token=$(cat .${travis_token}.token )
 
-curl -s -X POST $header \
+curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" \
  -H "Authorization: token ""$(cat .travis.token)" \
  -d "$body" \
  https://api.travis-ci.org/v3/repo/$travis_repo/requests
@@ -39,7 +37,7 @@ curl -s -X POST $header \
 request_result="$(post_job)"
 
 unset travis_token
-[ ${tracing_was_set}==0 ] || set -x
+[ "${tracing_was_set}" -eq 0 ] || set -x
 
 # this should return     "id": 444444,
 request_id=$(echo "${request_result}" | grep '"id":' | tail -n 1 )
