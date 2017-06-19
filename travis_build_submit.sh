@@ -1,23 +1,25 @@
-travis_matrix_script=${travis_matrix_script-'test/smoke.sh'}
+travis_script=${travis_script-'test/smoke.sh'}
 travis_env_global=${travis_env_global-'BRANCH=10.1'}
 travis_env_matrix=${travis_env_matrix-''}
 travis_repo=${travis_repo-13966407}
+
+set -e
 
 header=' -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3"'
 
 body='{
  "request": {
- "message": "Trigger '$matrix_script' with '${travis_env_global}'",
+ "message": "Trigger '$travis_script' with '${travis_env_global}'",
  "branch":"master",
  "config": {
    "env": {"global": ["'${travis_env_global}'"],
            "matrix": ["'${travis_env_matrix}'"]}
   }
-  "script":"${travis_script}"
+  "script":"'${travis_script}'"
 }}'
 
 tracing_was_set=0
-if [[ $(shopt -p xtace) ~=  on ]]  ; then
+if [[ $(shopt -o xtrace) =~ on ]]  ; then
   >&2 echo temporarily disabling bash tracing to hide travis token
   tracing_was_set=1
   set +x
@@ -29,9 +31,9 @@ function post_job {
 [ -f .${travis_repo}.token ] && travis_token=$(cat .${travis_token}.token )
 
 curl -s -X POST $header \
- -H "Authorization: token $(cat .travis.token)" \
+ -H "Authorization: token ""$(cat .travis.token)" \
  -d "$body" \
- https://api.travis-ci.org/repo/$repo/requests
+ https://api.travis-ci.org/v3/repo/$travis_repo/requests
 }
 
 request_result="$(post_job)"
@@ -53,7 +55,7 @@ if [ -z $request_id ] ; then
   exit 1
 fi
 
-request_details="$(curl -s -X GET $header https://api.travis-ci.org/v3/repo/$repo/request/$request_id)"
+request_details="$(curl -s -X GET $header https://api.travis-ci.org/v3/repo/$travis_repo/request/$request_id)"
 
 commit_id=$(echo "$request_details"| grep -A 10 '"commit": {' | grep  '"id":' | head -n 1)
 commit_id=${commit_id#*:}
@@ -65,7 +67,7 @@ if [ -z "$commit_id" ] ; then
   exit 1
 fi
 
-builds="$(curl -s -X GET $header https://api.travis-ci.org/v3/repo/$repo/builds)"
+builds="$(curl -s -X GET $header https://api.travis-ci.org/v3/repo/$travis_repo/builds)"
 
 build_id=$(echo "$builds" | grep -B 50 $commit_id | grep -A20 '"build"' | grep '"id":' | head -n 1)
 build_id=${build_id#*:}
