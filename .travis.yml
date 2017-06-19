@@ -3,9 +3,11 @@ dist: trusty
 sudo: false
 
 env:
+  global:
+    - travis_command='echo $argument1 $argument 2'
   matrix:
     - argument1=0, argument2=0
     - argument1=1, argument2=1
 
 script:
-    - _test/smoke.sh
+    - bash ${travis_command} 
