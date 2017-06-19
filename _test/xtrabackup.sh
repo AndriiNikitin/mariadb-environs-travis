@@ -1,5 +1,4 @@
-
-
+BRANCH=$1
 
 set -e
 echo "clone parent repo and get xtrabackup plugin"
