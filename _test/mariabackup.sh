@@ -1,8 +1,6 @@
 mdb_environ=$1
-xb_environ=$2
 
 [ -z ${mdb_environ} ] && { >&2 echo 'Expected Server branch as parameter'; exit 1; }
-[ -z ${xb_environ} ] && { >&2 echo 'Expected Xtrabackup version as parameter'; exit 1; }
 
 set -e
 
@@ -19,12 +17,11 @@ set -e
 cd farm
 ./get_plugin.sh xtrabackup
 e=$(./reuse_or_plant_m.sh ${mdb_environ})
-x=$(./reuse_or_plant_x.sh ${xb_environ})
 
 . build_or_download.sh $e
-. build_or_download.sh $x
 
+( [ "$MATRIX_CONFIGURE_REST_ENCRYPTION" == 1 ] && mkdir -p $e*/config_load && cp $e*/configure_rest_encryption.sh $e*/config_load/ ) || :
 ( [ "$MATRIX_CONFIGURE_INNODB_PLUGIN" == 1 ] && mkdir -p $e*/config_load && cp $e*/configure_innodb_plugin.sh $e*/config_load/ ) || :
 
-./runsuite.sh $e $x _plugin/xtrabackup/t
+./runsuite.sh $e _plugin/xtrabackup/t
 )

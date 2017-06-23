@@ -1,5 +1,12 @@
-travis_command=${travis_command-'_test/smoke.sh a1 a2'}
-travis_env_matrix=${travis_env_matrix-''}
+branch=$1
+
+if [ ! -z ${branch} ] ; then
+  travis_command="_test/mariabackup.sh ${branch}"
+  travis_env_matrix='"MATRIX_CONFIGURE_REST_ENCRYPTION=0","MATRIX_CONFIGURE_REST_ENCRYPTION=1","MATRIX_CONFIGURE_REST_ENCRYPTION=0 MATRIX_CONFIGURE_INNODB_PLUGIN=1","MATRIX_CONFIGURE_REST_ENCRYPTION=1 MATRIX_CONFIGURE_INNODB_PLUGIN=1"'
+else
+  travis_command=${travis_command-'_test/smoke.sh a1 a2'}
+  travis_env_matrix=${travis_env_matrix-''}
+fi
 travis_repo=${travis_repo-13966407}
 
 set -e

@@ -1,5 +1,5 @@
 
-export travis_command="_test/xtrabackup.sh bb-10.1-marko"
+export travis_command="_test/xtrabackup.sh 10.1"
 export travis_env_matrix='"MATRIX_CONFIGURE_REST_ENCRYPTION=0","MATRIX_CONFIGURE_REST_ENCRYPTION=1","MATRIX_CONFIGURE_REST_ENCRYPTION=0 MATRIX_CONFIGURE_INNODB_PLUGIN=1","MATRIX_CONFIGURE_REST_ENCRYPTION=1 MATRIX_CONFIGURE_INNODB_PLUGIN=1"'
 
 . travis_build_submit.sh
