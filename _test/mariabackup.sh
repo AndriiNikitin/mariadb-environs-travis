@@ -15,7 +15,7 @@ fi
 (
 set -e
 cd farm
-./get_plugin.sh xtrabackup
+./get_plugin.sh xtrabackup hasky
 e=$(./reuse_or_plant_m.sh ${mdb_environ})
 
 . build_or_download.sh $e
