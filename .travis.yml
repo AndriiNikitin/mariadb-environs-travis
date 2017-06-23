@@ -10,4 +10,4 @@ env:
     - argument1=1, argument2=1
 
 script:
-    - bash ${travis_command} 
+    - ${travis_command} 

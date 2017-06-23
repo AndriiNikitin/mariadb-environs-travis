@@ -23,5 +23,7 @@ e=$(./reuse_or_plant_m.sh ${mdb_environ})
 ( [ "$MATRIX_CONFIGURE_REST_ENCRYPTION" == 1 ] && mkdir -p $e*/config_load && cp $e*/configure_rest_encryption.sh $e*/config_load/ ) || :
 ( [ "$MATRIX_CONFIGURE_INNODB_PLUGIN" == 1 ] && mkdir -p $e*/config_load && cp $e*/configure_innodb_plugin.sh $e*/config_load/ ) || :
 
+echo $e $(pwd)
+
 ./runsuite.sh $e _plugin/xtrabackup/t
 )
